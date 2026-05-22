@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recipe — combined</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream:    #F7F3EC;
+    --paper:    #EDE8DF;
+    --ink:      #1C1812;
+    --ink-mid:  #3D3529;
+    --ink-low:  #7A6D5E;
+    --rule:     #C8C0B0;
+    --accent:   #B84C2E;
+    --accent-l: #F0E4DF;
+  }
+
+  html { font-size: 16px; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Lora', Georgia, serif;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      0deg, transparent, transparent 31px,
+      rgba(160,140,110,0.06) 31px, rgba(160,140,110,0.06) 32px
+    );
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  @media (min-width: 480px) {
+    .page { padding: 3rem 2rem 4rem; }
+  }
+
+  /* ── MASTHEAD ── */
+  .masthead {
+    text-align: center;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.75rem;
+    border-bottom: 1.5px solid var(--ink);
+  }
+
+  .masthead-overline {
+    font-family: 'Lora', serif;
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-low);
+    margin-bottom: 0.75rem;
+  }
+
+  .masthead-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.6rem, 10vw, 3.6rem);
+    font-weight: 400;
+    line-height: 1.05;
+    color: var(--ink);
+    letter-spacing: -0.01em;
+    margin-bottom: 1.5rem;
+  }
+
+  .masthead-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  /* pain point — big and clear */
+  .masthead-pain {
+    margin: 0 auto 0.6rem;
+    max-width: 480px;
+  }
+
+  .pain-line-1 {
+    display: block;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.05rem, 3.5vw, 1.2rem);
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    margin-bottom: 0.4rem;
+  }
+
+  .pain-line-2 {
+    display: block;
+    font-family: 'Lora', serif;
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    font-style: italic;
+    color: var(--ink-mid);
+    line-height: 1.6;
+  }
+
+  .masthead-sub {
+    margin: 1rem auto 0;
+    max-width: 400px;
+    font-family: 'Lora', serif;
+    font-size: 0.8rem;
+    color: var(--ink-low);
+    line-height: 1.65;
+  }
+
+  .masthead-rule {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.4rem;
+    justify-content: center;
+  }
+  .masthead-rule span { display: block; height: 1px; width: 50px; background: var(--ink); opacity: 0.25; }
+  .masthead-rule i { font-size: 0.5rem; color: var(--ink-low); letter-spacing: 0.12em; font-style: normal; }
+
+  /* ── UPLOAD ── */
+  .upload-zone {
+    border: 1.5px dashed var(--rule);
+    border-radius: 4px;
+    background: var(--paper);
+    padding: 2.25rem 1.25rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg, transparent, transparent 8px,
+      rgba(160,140,110,0.035) 8px, rgba(160,140,110,0.035) 9px
+    );
+  }
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent);
+    background: var(--accent-l);
+  }
+  .upload-zone > * { position: relative; }
+
+  .upload-icon { font-size: 2.2rem; color: var(--ink-low); margin-bottom: 0.6rem; display: block; }
+
+  .upload-main {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--ink);
+    margin-bottom: 0.3rem;
+  }
+  .upload-hint { font-size: 0.78rem; color: var(--ink-low); font-style: italic; }
+
+  input[type="file"] { display: none; }
+
+  /* ── PREVIEW ── */
+  .preview-frame {
+    display: none;
+    margin-top: 1.2rem;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+    position: relative;
+  }
+  .preview-frame img {
+    width: 100%; max-height: 280px; object-fit: cover; display: block; filter: sepia(8%);
+  }
+  .preview-frame::after {
+    content: ''; position: absolute; inset: 0;
+    box-shadow: inset 0 0 28px rgba(28,24,18,0.1);
+    pointer-events: none;
+  }
+
+  /* ── STATUS / ERROR ── */
+  .status-row {
+    display: none; align-items: center; gap: 0.75rem;
+    margin-top: 1.2rem; padding: 0.75rem 1rem;
+    background: var(--paper);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    font-size: 0.875rem; color: var(--ink-mid); font-style: italic;
+  }
+  .spinner {
+    width: 16px; height: 16px;
+    border: 1.5px solid var(--rule); border-top-color: var(--accent);
+    border-radius: 50%; animation: spin 0.75s linear infinite; flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error-block {
+    display: none; margin-top: 1rem; padding: 0.8rem 1rem;
+    background: var(--accent-l); border-left: 3px solid var(--accent);
+    border-radius: 0 3px 3px 0;
+    font-size: 0.875rem; color: var(--accent); font-style: italic;
+  }
+
+  /* ── RESULT ── */
+  .result { display: none; margin-top: 2rem; }
+
+  .recipe-header {
+    margin-bottom: 1.5rem; padding-bottom: 1.1rem;
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .recipe-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2.1rem);
+    font-weight: 600; line-height: 1.15; color: var(--ink); margin-bottom: 0.4rem;
+  }
+  .recipe-meta {
+    font-size: 0.75rem; color: var(--ink-low);
+    letter-spacing: 0.12em; text-transform: uppercase;
+  }
+
+  .steps-label {
+    font-family: 'Lora', serif; font-size: 0.65rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-low); margin-bottom: 0.9rem;
+  }
+
+  .step {
+    display: grid; grid-template-columns: 2rem 1fr; gap: 0 0.9rem;
+    margin-bottom: 1.2rem; padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--rule);
+    animation: stepIn 0.35s ease both;
+  }
+  .step:last-of-type { border-bottom: none; }
+
+  @keyframes stepIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-num {
+    width: 2rem; height: 2rem;
+    border: 1.5px solid var(--ink); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem; color: var(--ink); flex-shrink: 0; margin-top: 2px;
+  }
+
+  .step-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem; font-weight: 600; color: var(--ink); margin-bottom: 0.3rem;
+  }
+  .step-instruction {
+    font-family: 'Lora', serif; font-size: 0.9rem;
+    line-height: 1.75; color: var(--ink-mid);
+  }
+  .step-ings {
+    display: flex; flex-wrap: wrap; gap: 5px; margin-top: 0.7rem;
+  }
+  .ing-tag {
+    font-family: 'Lora', serif; font-size: 0.74rem; font-style: italic;
+    background: var(--paper); border: 1px solid var(--rule);
+    border-radius: 2px; padding: 2px 8px; color: var(--ink-mid);
+  }
+
+  .reset-btn {
+    display: inline-block; margin-top: 1.5rem;
+    font-family: 'Lora', serif; font-size: 0.8rem;
+    color: var(--ink-low); text-decoration: underline;
+    text-underline-offset: 3px; background: none; border: none;
+    cursor: pointer; font-style: italic; padding: 0;
+  }
+  .reset-btn:hover { color: var(--accent); }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .footer-icons {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.25rem;
+    opacity: 0.18;
+  }
+
+  .footer-credit {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--ink-low);
+    font-style: italic;
+    letter-spacing: 0.04em;
+  }
+  .footer-credit a { color: var(--ink-low); text-decoration: none; }
+  .footer-credit a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="masthead">
+    <p class="masthead-overline">A kitchen tool</p>
+
+    <h1 class="masthead-title">Recipe<br><em>combined</em></h1>
+
+    <div class="masthead-pain">
+      <span class="pain-line-1">Stop flipping between ingredients and method.</span>
+      <span class="pain-line-2">Upload your recipe — get the whole thing in one simple, step-by-step read.</span>
+    </div>
+
+    <p class="masthead-sub">Works with any photo — printed, handwritten, screenshot, or a cookbook page.</p>
+
+    <div class="masthead-rule">
+      <span></span>
+      <i>✦ ✦ ✦</i>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()" role="button" tabindex="0" aria-label="Upload a recipe photo">
+    <span class="upload-icon">⊕</span>
+    <p class="upload-main">Drop your recipe here</p>
+    <p class="upload-hint">photo, screenshot, or scan</p>
+    <input type="file" id="file-input" accept="image/*" aria-hidden="true">
+  </div>
+
+  <div class="preview-frame" id="preview-frame">
+    <img id="preview-img" alt="Uploaded recipe">
+  </div>
+
+  <div class="status-row" id="status-row">
+    <div class="spinner"></div>
+    <span id="status-text">Reading your recipe…</span>
+  </div>
+
+  <div class="error-block" id="error-block"></div>
+  <div class="result" id="result"></div>
+
+  <footer>
+    <div class="footer-icons" aria-hidden="true">
+      <svg width="32" height="44" viewBox="0 0 32 44" fill="none" stroke="#3D3529" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+        <ellipse cx="16" cy="38" rx="14" ry="5"/>
+        <line x1="16" y1="33" x2="16" y2="10"/>
+        <ellipse cx="16" cy="10" rx="6" ry="2.5"/>
+        <ellipse cx="16" cy="20" rx="12" ry="4" stroke-dasharray="3,2"/>
+      </svg>
+      <svg width="36" height="44" viewBox="0 0 36 44" fill="none" stroke="#3D3529" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="10" width="32" height="32" rx="2"/>
+        <line x1="8" y1="20" x2="28" y2="20"/>
+        <line x1="8" y1="27" x2="28" y2="27"/>
+        <line x1="8" y1="34" x2="22" y2="34"/>
+        <line x1="10" y1="4" x2="10" y2="14" stroke-dasharray="2,2"/>
+        <line x1="26" y1="4" x2="26" y2="14" stroke-dasharray="2,2"/>
+      </svg>
+      <svg width="40" height="44" viewBox="0 0 40 44" fill="none" stroke="#3D3529" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="20" cy="22" r="16"/>
+        <line x1="20" y1="22" x2="20" y2="10" stroke-width="1.4"/>
+        <line x1="20" y1="22" x2="29" y2="17" stroke-width="1.2"/>
+        <circle cx="20" cy="22" r="1.5" fill="#3D3529" stroke="none"/>
+        <line x1="10" y1="6" x2="13" y2="9"/>
+        <line x1="30" y1="6" x2="27" y2="9"/>
+      </svg>
+      <svg width="30" height="44" viewBox="0 0 30 44" fill="none" stroke="#3D3529" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 40 C4 40 1 22 15 10 C29 -2 32 12 28 22 C24 32 14 28 12 36 C10 42 14 44 14 44"/>
+        <ellipse cx="14" cy="40" rx="10" ry="3.5"/>
+        <path d="M15 10 C15 10 12 4 17 2" stroke-width="1"/>
+        <line x1="4" y1="34" x2="10" y2="34" stroke-width="0.8"/>
+        <line x1="22" y1="30" x2="28" y2="30" stroke-width="0.8"/>
+      </svg>
+      <svg width="40" height="44" viewBox="0 0 40 44" fill="none" stroke="#3D3529" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 36 Q4 6 20 6 Q36 6 36 36"/>
+        <line x1="4" y1="36" x2="36" y2="36"/>
+        <line x1="0" y1="42" x2="40" y2="42" stroke-width="1.4"/>
+        <ellipse cx="13" cy="17" rx="2.5" ry="2.5"/>
+        <ellipse cx="20" cy="12" rx="2.5" ry="2.5"/>
+        <ellipse cx="27" cy="17" rx="2.5" ry="2.5"/>
+        <line x1="13" y1="19" x2="13" y2="36" stroke-width="0.7" stroke-dasharray="2,2"/>
+        <line x1="20" y1="14" x2="20" y2="36" stroke-width="0.7" stroke-dasharray="2,2"/>
+        <line x1="27" y1="19" x2="27" y2="36" stroke-width="0.7" stroke-dasharray="2,2"/>
+      </svg>
+    </div>
+
+    <p class="footer-credit">Made with care &mdash; <a href="mailto:davidfrancoisrabie@gmail.com">davidfrancoisrabie@gmail.com</a></p>
+  </footer>
+
+</div>
+
+<script>
+const uploadZone   = document.getElementById('upload-zone');
+const fileInput    = document.getElementById('file-input');
+const previewFrame = document.getElementById('preview-frame');
+const previewImg   = document.getElementById('preview-img');
+const statusRow    = document.getElementById('status-row');
+const statusText   = document.getElementById('status-text');
+const resultEl     = document.getElementById('result');
+const errorBlock   = document.getElementById('error-block');
+
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+uploadZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+function handleFile(file) {
+  if (!file || !file.type.startsWith('image/')) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    previewImg.src = ev.target.result;
+    previewFrame.style.display = 'block';
+    uploadZone.style.display = 'none';
+    processRecipe(ev.target.result);
+  };
+  reader.readAsDataURL(file);
+}
+
+const statusMessages = ['Reading your recipe…','Matching ingredients to steps…','Laying it all out…'];
+
+async function processRecipe(dataUrl) {
+  statusRow.style.display = 'flex';
+  errorBlock.style.display = 'none';
+  resultEl.style.display = 'none';
+
+  let mi = 0;
+  const ticker = setInterval(() => {
+    mi = (mi + 1) % statusMessages.length;
+    statusText.textContent = statusMessages[mi];
+  }, 2400);
+
+  const base64    = dataUrl.split(',')[1];
+  const mediaType = dataUrl.split(';')[0].split(':')[1];
+
+  try {
+    const resp = await fetch('/api/recipe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ base64, mediaType })
+    });
+
+    clearInterval(ticker);
+    statusRow.style.display = 'none';
+
+    if (!resp.ok) throw new Error('API error ' + resp.status);
+    const recipe = await resp.json();
+    renderRecipe(recipe);
+
+  } catch (err) {
+    clearInterval(ticker);
+    statusRow.style.display = 'none';
+    errorBlock.textContent = "Couldn't read that one — try a clearer photo with even lighting and the full recipe visible.";
+    errorBlock.style.display = 'block';
+    console.error(err);
+  }
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderRecipe(r) {
+  const meta = [r.servings, r.time].filter(Boolean).join('  ·  ');
+
+  let html = `
+    <div class="recipe-header">
+      <h2 class="recipe-title">${esc(r.title)}</h2>
+      ${meta ? `<p class="recipe-meta">${esc(meta)}</p>` : ''}
+    </div>
+    <p class="steps-label">Method</p>
+  `;
+
+  (r.steps || []).forEach((step, i) => {
+    const delay = `animation-delay: ${i * 0.07}s`;
+    const pills = (step.ingredients || []).map(ing => `<span class="ing-tag">${esc(ing)}</span>`).join('');
+    const ingsBlock = pills ? `<div class="step-ings" aria-label="Ingredients for this step">${pills}</div>` : '';
+
+    html += `
+      <div class="step" style="${delay}">
+        <div class="step-num" aria-hidden="true">${i + 1}</div>
+        <div class="step-content">
+          <p class="step-label">${esc(step.label)}</p>
+          <p class="step-instruction">${esc(step.instruction)}</p>
+          ${ingsBlock}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `<button class="reset-btn" onclick="resetApp()">← try another recipe</button>`;
+  resultEl.innerHTML = html;
+  resultEl.style.display = 'block';
+}
+
+function resetApp() {
+  uploadZone.style.display = 'block';
+  previewFrame.style.display = 'none';
+  resultEl.style.display = 'none';
+  errorBlock.style.display = 'none';
+  resultEl.innerHTML = '';
+  fileInput.value = '';
+}
+</script>
+</body>
+</html>
